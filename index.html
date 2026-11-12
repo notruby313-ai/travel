@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>英国 18 天 · 行程日历</title>
+<style>
+:root{
+  --paper:#f5efe2; --paper2:#e9dfca; --card:#fffdf6;
+  --ink:#131c25; --ink2:#54606b; --ink3:#8a939c;
+  --accent:#a3352b; --brass:#a8822f; --line:#d9ceb6; --line2:#c7ba9c;
+  --london:#a3352b; --peak:#6d7c3c; --edi:#3f556c;
+  --hdr:112px;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",-apple-system,sans-serif;
+  --serif:Georgia,"Times New Roman","Songti SC","Source Han Serif SC","Noto Serif SC",serif;
+  --mono:"SF Mono",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(120% 70% at 82% -12%, #fffaf0 0%, rgba(255,250,240,0) 58%),
+    radial-gradient(90% 55% at -5% 105%, #e5dac2 0%, rgba(229,218,194,0) 62%),
+    var(--paper);
+  color:var(--ink); font-family:var(--sans); font-size:15px; line-height:1.7;
+  -webkit-font-smoothing:antialiased; overflow:hidden;
+}
+body::before{
+  content:""; position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.55;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(30,20,5,.020) 0 1px,rgba(0,0,0,0) 1px 3px),
+    repeating-linear-gradient(90deg,rgba(30,20,5,.016) 0 1px,rgba(0,0,0,0) 1px 4px);
+}
+.app{position:relative; z-index:2; height:100%}
+
+/* ---------- header ---------- */
+.top{
+  position:fixed; top:0; left:0; right:0; height:var(--hdr); z-index:40;
+  background:linear-gradient(180deg,rgba(245,239,226,.97),rgba(245,239,226,.88));
+  border-bottom:1px solid var(--line); backdrop-filter:blur(8px);
+}
+.top::after{
+  content:""; position:absolute; left:0; right:0; bottom:-4px; height:3px;
+  background:repeating-linear-gradient(90deg,var(--accent) 0 14px,transparent 14px 28px);
+  opacity:.22;
+}
+.top-in{max-width:1400px; margin:0 auto; height:100%; padding:12px 30px; display:flex; flex-direction:column; justify-content:center; gap:8px}
+.top-row{display:flex; align-items:baseline; gap:16px; flex-wrap:wrap}
+.brand{font-family:var(--serif); font-size:20px; letter-spacing:.16em; margin:0; font-weight:600}
+.brand em{font-style:normal; color:var(--accent)}
+.top-meta{font-size:12px; letter-spacing:.08em; color:var(--ink2)}
+.top-meta b{color:var(--ink); font-weight:600}
+.tape{display:flex; gap:5px; overflow-x:auto; padding-bottom:2px; scrollbar-width:none}
+.tape::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto; font-family:var(--mono); font-size:11px; letter-spacing:.04em;
+  padding:4px 9px; border:1px solid var(--line2); border-radius:2px; color:var(--ink2);
+  background:rgba(255,253,246,.7); cursor:pointer; transition:.22s; white-space:nowrap;
+}
+.chip:hover{background:var(--card); color:var(--ink); border-color:var(--ink3)}
+.chip.on{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+.chip.ov{font-family:var(--serif); letter-spacing:.12em}
+
+/* ---------- stage ---------- */
+.stage{position:fixed; inset:var(--hdr) 0 0 0; overflow:hidden}
+.screen{
+  position:absolute; inset:0; overflow-y:auto; overflow-x:hidden;
+  opacity:0; transform:translateX(30px); pointer-events:none; padding-bottom:96px;
+  transition:opacity .42s ease, transform .5s cubic-bezier(.2,.7,.3,1);
+}
+.screen.on{opacity:1; transform:none; pointer-events:auto}
+.wrap{max-width:1360px; margin:0 auto; padding:26px 30px 10px}
+
+/* ---------- day head ---------- */
+.dhead{display:flex; align-items:flex-start; gap:20px; padding-bottom:16px; border-bottom:1px solid var(--line); margin-bottom:20px}
+.dno{
+  font-family:var(--serif); font-size:62px; line-height:.9; letter-spacing:-.02em;
+  color:transparent; -webkit-text-stroke:1.5px var(--line2); flex:0 0 auto; padding-top:4px;
+}
+.dmeta{flex:1 1 auto; min-width:0}
+.ddate{font-family:var(--mono); font-size:11.5px; letter-spacing:.16em; color:var(--accent); text-transform:uppercase}
+.dmeta h2{font-family:var(--serif); font-size:clamp(22px,2.6vw,30px); margin:4px 0 6px; font-weight:600; letter-spacing:.02em; line-height:1.25}
+.dsub{font-size:13px; color:var(--ink2)}
+.dstay{
+  flex:0 0 auto; font-size:11.5px; letter-spacing:.06em; color:var(--ink2);
+  border:1px dashed var(--line2); padding:5px 11px; border-radius:2px; background:rgba(255,253,246,.6);
+}
+.dstay b{color:var(--ink); font-weight:600}
+
+/* ---------- layout ---------- */
+.dgrid{display:grid; grid-template-columns:1.02fr .98fr; gap:34px; align-items:start}
+
+/* ---------- art ---------- */
+.art{
+  position:relative; height:clamp(180px,25vh,290px); border:1px solid var(--line);
+  background:var(--card); overflow:hidden; border-radius:2px;
+  box-shadow:0 1px 0 var(--line2), 0 14px 30px -22px rgba(40,30,10,.55);
+}
+.scene{display:block; width:100%; height:100%}
+.art-cap{
+  position:absolute; left:0; bottom:0; padding:5px 11px; font-family:var(--mono);
+  font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#fff;
+  background:rgba(19,28,37,.66); backdrop-filter:blur(2px);
+}
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin:12px 0 0}
+.tag{
+  font-size:11.5px; letter-spacing:.02em; padding:3px 9px; border-radius:999px;
+  border:1px solid var(--line2); color:var(--ink2); background:rgba(255,253,246,.65);
+}
+.tag.hp{border-color:#b48a3a; color:#8a6320}
+.tag.cn{border-color:var(--accent); color:var(--accent)}
+.tag.warn{border-color:#c07a3a; color:#a35a1d; background:rgba(240,200,150,.28)}
+.tag.ok{border-color:#7d8f52; color:#5c6b34}
+
+/* ---------- map ---------- */
+.mapbox{margin-top:14px; border:1px solid var(--line); background:
+  linear-gradient(180deg,rgba(255,253,246,.9),rgba(240,234,219,.55)); border-radius:2px; padding:6px 6px 2px}
+.map{display:block; width:100%; height:auto}
+.legend{display:flex; flex-wrap:wrap; gap:12px; padding:2px 8px 8px; font-size:10.5px; color:var(--ink2); letter-spacing:.03em}
+.legend i{display:inline-block; width:20px; height:0; border-top-width:2px; border-top-style:solid; vertical-align:middle; margin-right:5px}
+
+/* ---------- timeline ---------- */
+.tl{list-style:none; margin:0; padding:0 4px 0 0; max-height:calc(100vh - var(--hdr) - 200px); overflow-y:auto}
+.tl::-webkit-scrollbar{width:5px}
+.tl::-webkit-scrollbar-thumb{background:var(--line2); border-radius:3px}
+.tl-i{display:grid; grid-template-columns:56px 22px 1fr; gap:0; padding:0}
+.tl-t{font-family:var(--mono); font-size:12px; color:var(--ink2); padding-top:11px; letter-spacing:.02em}
+.tl-rail{position:relative; display:flex; justify-content:center}
+.tl-rail::before{content:""; position:absolute; top:0; bottom:0; width:1px; background:var(--line)}
+.tl-i:first-child .tl-rail::before{top:16px}
+.tl-i:last-child .tl-rail::before{bottom:calc(100% - 16px)}
+.tl-d{
+  position:relative; z-index:1; width:7px; height:7px; border-radius:50%;
+  background:var(--paper); border:1px solid var(--line2); margin-top:15px;
+}
+.tl-i.key .tl-d{background:var(--rc,var(--accent)); border-color:var(--rc,var(--accent)); box-shadow:0 0 0 3px rgba(163,53,43,.12)}
+.tl-c{padding:8px 0 14px 12px; min-width:0}
+.tl-n{font-size:14.5px; font-weight:600; letter-spacing:.01em; display:flex; gap:8px; align-items:flex-start}
+.pin{
+  flex:0 0 auto; width:17px; height:17px; border-radius:50%; background:var(--rc,var(--accent));
+  color:#fff; font-family:var(--mono); font-size:10px; line-height:17px; text-align:center; margin-top:2px;
+}
+.tl-x{font-size:12.5px; color:var(--ink2); margin-top:3px; line-height:1.65}
+.note{
+  margin-top:16px; padding:12px 14px; border-left:2px solid var(--rc,var(--accent));
+  background:rgba(255,253,246,.72); font-size:12.5px; color:var(--ink2); line-height:1.7;
+}
+.note b{color:var(--ink); font-weight:600}
+
+/* ---------- overview ---------- */
+.ov-hero{display:grid; grid-template-columns:1.15fr .85fr; gap:36px; align-items:start}
+.ov-kicker{font-family:var(--mono); font-size:11.5px; letter-spacing:.24em; color:var(--accent); text-transform:uppercase}
+.ov-h1{font-family:var(--serif); font-size:clamp(30px,4.6vw,52px); line-height:1.12; margin:10px 0 14px; letter-spacing:.01em; font-weight:600}
+.ov-h1 span{color:var(--accent)}
+.ov-p{font-size:14px; color:var(--ink2); max-width:46ch; line-height:1.85}
+.ov-stats{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:24px; border-top:1px solid var(--line); padding-top:18px}
+.ov-stats div b{display:block; font-family:var(--serif); font-size:26px; line-height:1.1}
+.ov-stats div span{font-size:11px; letter-spacing:.08em; color:var(--ink3)}
+.ov-map{border:1px solid var(--line); background:linear-gradient(180deg,#fffdf6,#f1ead9); border-radius:2px; padding:10px}
+.route3{display:grid; gap:8px; margin-top:16px}
+.r3{display:flex; align-items:center; gap:10px; font-size:12.5px; color:var(--ink2)}
+.r3 b{font-weight:600; color:var(--ink); font-family:var(--mono); font-size:11.5px; letter-spacing:.06em}
+.r3 em{flex:1; height:1px; background:repeating-linear-gradient(90deg,var(--line2) 0 5px,transparent 5px 10px)}
+
+/* ---------- controls ---------- */
+.ctrls{
+  position:fixed; left:0; right:0; bottom:0; height:64px; z-index:40;
+  display:flex; align-items:center; justify-content:center; gap:14px;
+  background:linear-gradient(0deg,rgba(245,239,226,.99),rgba(245,239,226,.82));
+  border-top:1px solid var(--line); backdrop-filter:blur(8px);
+}
+.nb{
+  width:38px; height:38px; border-radius:50%; border:1px solid var(--line2); background:var(--card);
+  color:var(--ink); font-size:16px; cursor:pointer; transition:.2s; display:grid; place-items:center;
+}
+.nb:hover{background:var(--ink); color:var(--paper); border-color:var(--ink); transform:translateY(-1px)}
+.nb:disabled{opacity:.3; cursor:default; transform:none; background:var(--card); color:var(--ink)}
+.prog{width:min(38vw,340px); height:2px; background:var(--line); position:relative}
+.prog i{position:absolute; left:0; top:0; bottom:0; background:var(--accent); transition:width .45s cubic-bezier(.2,.7,.3,1)}
+.cnt{font-family:var(--mono); font-size:11.5px; letter-spacing:.1em; color:var(--ink2); min-width:64px; text-align:center}
+.cnt b{color:var(--ink)}
+
+/* ---------- motion ---------- */
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.screen.on .art{animation:fadeIn .7s ease both}
+.screen.on .tl-i{animation:rise .5s ease both; animation-delay:calc(var(--i) * 42ms + .12s)}
+.screen.on .mtx{animation:pop .45s ease both; animation-delay:calc(var(--i) * 70ms + .25s)}
+.screen.on .dhead{animation:rise .55s ease both}
+.screen.on .ov-hero > *{animation:rise .6s ease both}
+.screen.on .ov-hero > *:nth-child(2){animation-delay:.1s}
+
+/* ---------- responsive ---------- */
+@media (max-width:980px){
+  :root{--hdr:96px}
+  .wrap{padding:18px 16px 10px}
+  .dgrid{grid-template-columns:1fr; gap:18px}
+  .ov-hero{grid-template-columns:1fr; gap:22px}
+  .ov-stats{grid-template-columns:repeat(2,1fr)}
+  .dno{font-size:44px}
+  .dhead{gap:12px; flex-wrap:wrap}
+  .dstay{order:3}
+  .tl{max-height:none; overflow:visible}
+  .top-in{padding:10px 16px; gap:6px}
+  .brand{font-size:16px; letter-spacing:.1em}
+  .top-meta{font-size:11px}
+  .art{height:190px}
+  .legend{gap:8px; font-size:10px}
+  .cnt{min-width:52px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important; transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <div class="top-in">
+      <div class="top-row">
+        <h1 class="brand">英国 <em>18</em> 天 · 行程日历</h1>
+        <div class="top-meta">伦敦 <b>13 晚</b> · 峰区 <b>1 晚</b> · 爱丁堡 <b>2 晚</b> · 2027.01.15 – 02.01</div>
+      </div>
+      <div class="tape" id="tape"></div>
+    </div>
+  </header>
+
+  <main class="stage" id="stage"></main>
+
+  <div class="ctrls">
+    <button class="nb" id="prev" aria-label="上一天">&#8592;</button>
+    <div class="prog"><i id="prog" style="width:0"></i></div>
+    <div class="cnt" id="cnt"><b>1</b> / 19</div>
+    <button class="nb" id="next" aria-label="下一天">&#8594;</button>
+  </div>
+
+</div>
+<script>
+/* ============================================================
+   行程数据：18 天
+   it = 时间轴；map.stops 的 k 指向 it 的下标
+   ============================================================ */
+const DAYS = [
+{n:1, d:'1/15', wd:'周五', city:'伦敦', rc:'london', scene:'arrive', cap:'London · Arrival',
+ title:'落地 · 进城 · 休整', sub:'希思罗 → 帕丁顿 → 住处',
+ stay:'伦敦',
+ tags:[['','伊丽莎白线 30 分钟'],['warn','当天不排硬项目']],
+ it:[
+  {t:'14:00', n:'希思罗 T5 落地', d:'入境排队预留 45 分钟，取完行李再走'},
+  {t:'15:30', n:'伊丽莎白线进城 → 帕丁顿', d:'30 分钟直达，闸机直接刷银行卡或手机 NFC'},
+  {t:'17:00', n:'到住处 · 放行李', d:'先确认住的区，后面每天通勤都靠它'},
+  {t:'18:30', n:'附近晚餐 + 超市补给', d:'顺手买张交通卡或确认手机 Pay 能刷'}
+ ],
+ map:{stops:[{k:0,x:10,y:74},{k:1,x:36,y:54},{k:2,x:66,y:36},{k:3,x:84,y:58}], segs:[[0,1,'train'],[1,2,'walk'],[2,3,'walk']]},
+ note:'今晚只做三件事：洗澡、吃饭、睡觉。时差没倒过来就出门，前三天全报废。'},
+
+{n:2, d:'1/16', wd:'周六', city:'伦敦', rc:'london', scene:'westminster', cap:'Westminster · Whitehall',
+ title:'西敏 · 白厅 · 考文特', sub:'西敏寺 → 大本钟 → 白厅 → 特拉法加 → 考文特',
+ stay:'伦敦',
+ tags:[['hp','西敏寺《达芬奇密码》'],['cn','柯南 ★★ 大本钟'],['ok','9:30 开门就进，别拖到中午']],
+ it:[
+  {t:'09:20', n:'西敏寺 门口排队', d:'周六 9:30 开门，线上买好时段票；周日只做礼拜不接游客，所以这片整体挪到今天'},
+  {t:'11:15', n:'大本钟 · 西敏桥', d:'柯南表白机位：西敏桥东侧人行道，钟塔和河一起收'},
+  {t:'11:50', n:'白厅 · 骑兵卫队', d:'整点前后有骑兵换岗，站几分钟就走，不用等'},
+  {t:'12:20', n:'午餐（白厅 / 特拉法加一带）', d:'往特拉法加方向走，路边 pub 的当日汤最划算'},
+  {t:'13:30', n:'特拉法加广场', d:'柯南街景背景，喷泉边坐一会儿'},
+  {t:'14:00', n:'国家美术馆', d:'周六开到 18:00，挑 30 号厅的梵高和透纳那几间看'},
+  {t:'16:00', n:'考文特花园', d:'街头艺人 + 苹果市场，坐二十分钟就够'},
+  {t:'16:40', n:'Cecil Court 旧书店', d:'罗琳常来的小街，是对角巷灵感来源（不是取景地）；周六开、周日关'},
+  {t:'17:20', n:'查令十字街 · Seven Dials', d:'一路往北收尾，天黑后书店和橱窗灯最好看'}
+ ],
+ map:{stops:[{k:0,x:10,y:30},{k:1,x:22,y:42},{k:2,x:30,y:56},{k:3,x:40,y:66},{k:4,x:52,y:58},{k:5,x:62,y:46},{k:6,x:74,y:56},{k:7,x:84,y:44},{k:8,x:92,y:32}], segs:[[0,1,'walk'],[1,2,'walk'],[2,3,'walk'],[3,4,'walk'],[4,5,'walk'],[5,6,'walk'],[6,7,'walk'],[7,8,'walk']]},
+ note:'西敏寺内部只有周一到周六对游客开放，所以整个西敏片区挪到周六；全天从西敏寺一路往东北走到考文特，单向一条线，不折返。换岗不看了，省下来的 90 分钟正好够西敏寺内部。'},
+
+{n:3, d:'1/17', wd:'周日', city:'伦敦', rc:'london', scene:'museum', cap:'British Museum · St James’s',
+ title:'大英博物馆 · 圣詹姆斯', sub:'大英博物馆 → 白金汉宫外景 → 战争室',
+ stay:'伦敦',
+ tags:[['','大英博物馆免费，需预约'],['ok','不看换岗，省 90 分钟露天站立'],['warn','战争室 18:00 关，17:00 后不进']],
+ it:[
+  {t:'10:00', n:'大英博物馆', d:'周日 10:00 开，比周六松；先看罗塞塔石碑和帕特农，别贪多'},
+  {t:'13:15', n:'午餐（布鲁姆斯伯里一带）', d:'博物馆后门 Museum Street 那几家不用排队'},
+  {t:'14:30', n:'白金汉宫 外景', d:'宫殿正面 + 维多利亚纪念碑拍两张就走；换岗那场要露天站 90 分钟，这版不排'},
+  {t:'15:00', n:'圣詹姆斯公园', d:'穿园往西敏方向走，湖上有鹈鹕，风大就走南侧林荫道'},
+  {t:'15:45', n:'丘吉尔战争室', d:'地下展厅，正好躲风；周日开到 18:00'},
+  {t:'17:15', n:'回住处', d:'Westminster 站直达，晚上就近吃'}
+ ],
+ map:{stops:[{k:0,x:14,y:32},{k:1,x:30,y:46},{k:2,x:48,y:34},{k:3,x:62,y:46},{k:4,x:78,y:34},{k:5,x:90,y:56}], segs:[[0,1,'walk'],[1,2,'tube'],[2,3,'walk'],[3,4,'walk'],[4,5,'tube']]},
+ note:'换岗仪式要提前 45 分钟占位、露天站 90 分钟，冷且收益不高，这版直接去掉；白金汉宫只拍外景。空出来的时间给西敏寺内部（已挪到 1/16 周六），周日这天反而变成三天里最松的一天，适合倒时差。'},
+
+{n:4, d:'1/18', wd:'周一', city:'伦敦', rc:'london', scene:'city', cap:'City of London · South Bank',
+ title:'金融城 · 南岸', sub:'圣保罗 → 千禧桥 → 博罗市场 → 对角巷 → 塔桥',
+ stay:'伦敦',
+ tags:[['hp','哈利波特浓度最高'],['','利德贺市场仅工作日开'],['warn','Sky Garden 需提前一周预约']],
+ it:[
+  {t:'09:30', n:'圣保罗大教堂 登顶', d:'528 级台阶，登顶约 40 分钟，早去不用排队'},
+  {t:'11:15', n:'千禧桥', d:'《混血王子》被摧毁的那座桥，站桥中间回拍圣保罗'},
+  {t:'11:45', n:'泰特现代美术馆', d:'免费，看涡轮大厅的装置就值回时间'},
+  {t:'13:00', n:'博罗市场 午餐', d:'周一摊位比周六少，但主力熟食店都开'},
+  {t:'14:30', n:'利德贺市场（对角巷）', d:'走到 Bull’s Head Passage 42 号，那扇蓝门就是破釜酒吧入口'},
+  {t:'15:45', n:'Sky Garden 观景', d:'免费但必须预约，日落前 1 小时上去最好'},
+  {t:'17:15', n:'塔桥 · 夜景', d:'河北岸步道，灯亮起来再拍'}
+ ],
+ map:{stops:[{k:0,x:12,y:30},{k:1,x:24,y:44},{k:2,x:32,y:58},{k:3,x:26,y:74},{k:4,x:52,y:72},{k:5,x:66,y:50},{k:6,x:84,y:60}], segs:[[0,1,'walk'],[1,2,'walk'],[2,3,'walk'],[3,4,'walk'],[4,5,'walk'],[5,6,'walk']]},
+ note:'利德贺市场只在工作日开（8:00–18:00），所以这一天必须排周一；蓝门在侧巷 Bull’s Head Passage 42 号，别只在大厅里转。'},
+
+{n:5, d:'1/19', wd:'周二', city:'伦敦', rc:'london', scene:'kingscross', cap:'King’s Cross · Baker Street',
+ title:'国王十字 · 贝克街', sub:'9¾ 站台 → 摄政公园 → 221B → 摄政街',
+ stay:'伦敦',
+ tags:[['hp','9¾ 站台 / 圣潘克拉斯'],['cn','柯南 ★★ 贝克街 221B'],['','周二 221B 正常开']],
+ it:[
+  {t:'09:30', n:'国王十字 9¾ 站台', d:'大厅里有半截行李车，工作人员帮你甩围巾，排队约 20 分钟'},
+  {t:'10:15', n:'圣潘克拉斯车站', d:'《密室》罗恩飞车那段的外景，红砖立面本身值得拍'},
+  {t:'11:00', n:'摄政公园', d:'穿过公园往南，冬天人极少'},
+  {t:'11:45', n:'贝克街 221B 福尔摩斯博物馆', d:'16 英镑左右，进门先看门口的警察（合影要小费）'},
+  {t:'14:00', n:'皮卡迪利圆环', d:'柯南广告牌街景，站 Eros 雕像台阶上拍'},
+  {t:'14:45', n:'摄政街 · 牛津街', d:'1 月打折季，晚上灯饰还在'}
+ ],
+ map:{stops:[{k:0,x:10,y:26},{k:1,x:22,y:38},{k:2,x:40,y:30},{k:3,x:56,y:20},{k:4,x:76,y:48},{k:5,x:90,y:62}], segs:[[0,1,'walk'],[1,2,'walk'],[2,3,'walk'],[3,4,'tube'],[4,5,'walk']]},
+ note:'这一天是“北 → 西”单向行进，不走回头路：车站 → 公园 → 贝克街 → 皮卡迪利 → 摄政街。'},
+
+{n:6, d:'1/20', wd:'周三', city:'牛津', rc:'london', scene:'oxford', cap:'Oxford · Day Trip',
+ title:'牛津一日', sub:'基督教堂学院 → 博德利 → 拉德克利夫圆厅',
+ stay:'伦敦',
+ tags:[['hp','《魔法石》大厅'],['','Paddington 出发 1 小时'],['warn','学院常有临时闭馆，出发前查']],
+ it:[
+  {t:'08:15', n:'Paddington 出发', d:'Great Western 直达牛津，约 55 分钟'},
+  {t:'09:30', n:'基督教堂学院', d:'《魔法石》大厅的取景地，门票要提前买时段'},
+  {t:'11:15', n:'博德利图书馆', d:'《魔法石》图书馆禁区；必须跟导览进场'},
+  {t:'12:30', n:'Covered Market 午餐', d:'市场里有几家老摊，比主街便宜一半'},
+  {t:'13:45', n:'拉德克利夫圆厅', d:'牛津最上镜的一栋，圆厅前的草地随便坐'},
+  {t:'16:00', n:'回伦敦', d:'傍晚回城，晚上可以在附近随便吃'}
+ ],
+ map:{stops:[{k:0,x:8,y:64},{k:1,x:34,y:42},{k:2,x:56,y:32},{k:3,x:70,y:48},{k:4,x:58,y:66},{k:5,x:88,y:76}], segs:[[0,1,'train'],[1,2,'walk'],[2,3,'walk'],[3,4,'walk'],[4,5,'train']]},
+ note:'牛津当天往返足够，但别把比斯特塞进同一天 —— 两地各半天会很赶，比斯特已经单独排在 1/23。'},
+
+{n:7, d:'1/21', wd:'周四', city:'剑桥', rc:'london', scene:'cambridge', cap:'Cambridge · King’s College',
+ title:'剑桥一日 · 学院与康河', sub:'国王学院 → 三一 → 叹息桥 → The Backs',
+ stay:'伦敦',
+ tags:[['ok','King’s Cross 直达 50 分钟'],['warn','学期中部分学院限时开放'],['','全天室内外交替，不用长时间露天']],
+ it:[
+  {t:'08:00', n:'King’s Cross → Cambridge', d:'快车约 50 分钟；出站走 15 分钟进老城，或坐 Citi 1/3 两站'},
+  {t:'09:20', n:'国王学院礼拜堂', d:'1 月约 9:30–15:30 开放；扇形穹顶、《再别康桥》石碑都在这，室内暖和'},
+  {t:'10:30', n:'三一学院 · 牛顿苹果树', d:'大门和前庭可进；学期中部分区域只对师生开放，门口牌子上有当天说明'},
+  {t:'11:20', n:'圣约翰学院 · 叹息桥', d:'门票约 12 英镑，进院子看叹息桥和 New Court'},
+  {t:'12:30', n:'Market Square 午餐', d:'Fitzbillies 的肉桂卷 + 市场热食摊，进屋吃暖再出门'},
+  {t:'13:45', n:'The Backs 河畔步道', d:'沿康河走 40 分钟，看数学桥和国王学院后庭；风大就钻进学院回廊缓一缓'},
+  {t:'15:15', n:'菲茨威廉博物馆', d:'免费，室内暖和；不想看画就改去市集补件羊毛围巾'},
+  {t:'16:10', n:'回伦敦', d:'16:30 天黑，回程车上补觉；17:20 到 King’s Cross'}
+ ],
+ map:{stops:[{k:0,x:8,y:66},{k:1,x:30,y:44},{k:2,x:46,y:34},{k:3,x:58,y:22},{k:4,x:44,y:56},{k:5,x:72,y:58},{k:6,x:84,y:72},{k:7,x:94,y:44}], segs:[[0,1,'train'],[1,2,'walk'],[2,3,'walk'],[3,4,'walk'],[4,5,'walk'],[5,6,'walk'],[6,7,'train']]},
+ note:'白崖换成了剑桥：1 月七姐妹崖口风大体感零度上下，而剑桥这天是"走 10 分钟 → 进室内"的节奏，礼拜堂、学院回廊、市场、博物馆轮流取暖，普通羽绒服足够。撑篙 1 月仍在运营，但船上吹 45 分钟风，这版不排 —— 想坐就把它换掉 The Backs 步行，记得挑有毯子的船家。'},
+
+{n:8, d:'1/22', wd:'周五', city:'温莎', rc:'london', scene:'windsor', cap:'Windsor · South Kensington',
+ title:'温莎 + 南肯辛顿', sub:'温莎城堡 → V&A → 自然史博物馆',
+ stay:'伦敦',
+ tags:[['hp','《王冠》《国王的演讲》'],['warn','城堡周二、周三闭馆'],['ok','一条 Paddington 线走完，不折返']],
+ it:[
+  {t:'08:30', n:'Paddington → Windsor', d:'在 Slough 换一次车，约 40 分钟'},
+  {t:'09:45', n:'温莎城堡', d:'国事厅 + 圣乔治礼拜堂，2 小时足够；换岗日会封路'},
+  {t:'12:30', n:'回 Paddington', d:'车程 40 分钟，路上吃个三明治'},
+  {t:'14:00', n:'V&A 博物馆', d:'免费，看珠宝厅和时装展厅'},
+  {t:'16:00', n:'自然史博物馆', d:'免费，蓝鲸骨架大厅；周五下午人相对少'},
+  {t:'18:00', n:'回住处', d:'South Kensington 直达'}
+ ],
+ map:{stops:[{k:0,x:12,y:40},{k:1,x:32,y:20},{k:2,x:54,y:46},{k:3,x:70,y:64},{k:4,x:84,y:50},{k:5,x:94,y:70}], segs:[[0,1,'train'],[1,2,'train'],[2,3,'walk'],[3,4,'walk'],[4,5,'tube']]},
+ note:'城堡周二、周三闭馆，排在周五正好避开；周五人也不算多，上午先去城堡，下午回城逛博物馆。'},
+
+{n:9, d:'1/23', wd:'周六', city:'比斯特', rc:'london', scene:'bicester', cap:'Bicester Village · Outlet',
+ title:'比斯特购物村', sub:'伦敦最后一天 · 周六 · 开门就到',
+ stay:'伦敦',
+ tags:[['','Marylebone 直达 46 分钟'],['warn','周六最挤，开门就到'],['','银联卡可换 9 折券']],
+ it:[
+  {t:'08:40', n:'Marylebone 出发', d:'直达 46–54 分钟；这段不能用 Oyster，要单独买票'},
+  {t:'09:40', n:'游客中心领 9 折券', d:'出示银联卡换券，开门前 10 分钟到'},
+  {t:'10:00', n:'Burberry / Gucci 先冲', d:'热门款开门半小时内被扫完'},
+  {t:'13:00', n:'午餐 + 寄存', d:'村内有免费行李寄存，买多了先存'},
+  {t:'19:00', n:'回伦敦', d:'周六全天人多，早上货最全，下午热门码数就断'}
+ ],
+ map:{stops:[{k:0,x:12,y:56},{k:1,x:42,y:34},{k:2,x:62,y:48},{k:3,x:80,y:34},{k:4,x:26,y:78}], segs:[[0,1,'train'],[1,2,'walk'],[2,3,'walk'],[3,4,'train']]},
+ note:'周六是客流高峰，热门款开门半小时内被扫完，务必 9:40 前到游客中心领券。满 100 英镑可退税，带护照。'},
+
+{n:10, d:'1/24', wd:'周日', city:'峰区', rc:'peak', scene:'manor', cap:'Chatsworth · Hardwick Hall',
+ title:'达西庄园 · 进屋版', sub:'查茨沃斯外观 → 哈德威克庄园内部',
+ stay:'谢菲尔德',
+ tags:[['hp','2005《傲慢与偏见》Pemberley 外观'],['ok','哈德威克 1 月通常 11:00–15:30 开'],['warn','查茨沃斯宅邸 1 月闭馆，只能看外观']],
+ it:[
+  {t:'08:00', n:'St Pancras → Chesterfield', d:'直达约 1 小时 50 分；Chesterfield 正好夹在两个庄园中间，各 20 分钟车程'},
+  {t:'10:10', n:'打车 → 查茨沃斯', d:'20 分钟，约 15 英镑；先看外观，11 点前后是侧光'},
+  {t:'10:30', n:'查茨沃斯 庄园公园', d:'Pemberley 外观 + 湖景，只走车道和碎石主路；宅邸与花园 1 月闭馆，进不去'},
+  {t:'12:10', n:'打车 → 哈德威克庄园', d:'35 分钟，约 30 英镑；也可以请上午的司机等，谈个来回价更省'},
+  {t:'12:50', n:'谷仓餐厅 午餐', d:'Hardwick 的 Great Barn，进屋吃热的再逛'},
+  {t:'13:30', n:'哈德威克庄园 内部', d:'Bess of Hardwick 建的伊丽莎白宅子，"more glass than wall" 就是它；长画廊、都铎挂毯、刺绣都在屋里'},
+  {t:'15:20', n:'打车回 Chesterfield', d:'20 分钟，约 15 英镑；15:50 到站台'},
+  {t:'16:15', n:'Chesterfield → Sheffield', d:'15 分钟，班次密；住站边，明早直接上车'}
+ ],
+ map:{stops:[{k:0,x:8,y:66},{k:1,x:26,y:44},{k:2,x:40,y:32},{k:3,x:56,y:46},{k:4,x:66,y:60},{k:5,x:78,y:46},{k:6,x:88,y:62},{k:7,x:96,y:78}], segs:[[0,1,'taxi'],[1,2,'walk'],[2,3,'taxi'],[3,4,'walk'],[4,5,'walk'],[5,6,'taxi'],[6,7,'train']]},
+ note:'查茨沃斯宅邸每年开到 1 月初，然后关到 3 月下旬，所以 1 月只能看外观。这一版把"进屋"换成哈德威克：Bess of Hardwick 建的伊丽莎白宅子，正是德文郡公爵家族的祖上产业 —— 她的后代后来才盖了查茨沃斯，一个祖宅一个孙宅，正好接上。布拉汉姆宫（丘吉尔出生地）1 月整月在做年度大扫除，同样进不去，所以没选它。'},
+
+{n:11, d:'1/25', wd:'周一', city:'谢菲尔德 → 爱丁堡', rc:'edi', scene:'north', cap:'Northbound · Sheffield → Edinburgh',
+ title:'北上爱丁堡', sub:'直达火车 → 皇家一英里 → 卡尔顿山',
+ stay:'爱丁堡',
+ tags:[['ok','CrossCountry 直达，不换乘'],['ok','伯恩斯之夜 1/25'],['','不再摸黑早起，下午整段给老城']],
+ it:[
+  {t:'08:30', n:'酒店早餐 · 退房', d:'住站边，走过去 5 分钟'},
+  {t:'09:00', n:'Sheffield → 爱丁堡 直达', d:'3 小时 20 分；过 Berwick 那一段右侧靠窗能看海'},
+  {t:'12:20', n:'抵爱丁堡 · 入住', d:'老城或新城都行，拖着箱子别爬皇家一英里'},
+  {t:'14:00', n:'皇家一英里 · 维多利亚街', d:'对角巷原型之一，弯道那一段最好拍'},
+  {t:'15:30', n:'卡尔顿山 日落', d:'从王子街侧走缓坡 10 分钟上去，路面结冰就走车道绕'},
+  {t:'19:00', n:'Burns Supper', d:'1/25 正是伯恩斯之夜，提前订位'}
+ ],
+ map:{stops:[{k:0,x:10,y:70},{k:1,x:40,y:44},{k:2,x:62,y:30},{k:3,x:74,y:48},{k:4,x:84,y:62},{k:5,x:70,y:78}], segs:[[0,1,'train'],[1,2,'train'],[2,3,'walk'],[3,4,'walk'],[4,5,'walk']]},
+ note:'岩脊远望整段去掉了，这天就不再需要早起摸黑 —— 09:00 的车、12:20 到爱丁堡，下午整段留给老城和日落。想更松就坐 10:00 那班，18:00 前也够上卡尔顿山。直接省下的还有一次打车和山村民宿那一晚，改成住 Sheffield 站边，明早五分钟进站。'},
+
+{n:12, d:'1/26', wd:'周二', city:'爱丁堡', rc:'edi', scene:'edinburgh', cap:'Edinburgh Castle · Old Town',
+ title:'爱丁堡全天', sub:'城堡 → 玛丽金小巷 → 峭壁环山路',
+ stay:'爱丁堡',
+ tags:[['hp','《勇敢的心》《王冠》'],['','城堡 9:30 开门就进'],['ok','不登顶：走环山路平地看日落']],
+ it:[
+  {t:'09:30', n:'爱丁堡城堡', d:'开门就进，人少；王冠宝石和命运之石在同一个厅'},
+  {t:'12:30', n:'皇家一英里 午餐', d:'主街往东，越靠近宫殿越便宜'},
+  {t:'14:00', n:'玛丽金小巷', d:'地下街导览 1 小时，必须提前订'},
+  {t:'15:00', n:'索尔兹伯里峭壁 环山路', d:'荷里路德公园入口走柏油环山路 15 分钟，全程平缓不爬坡，正对亚瑟王座；16:20 原路返回，天黑前出公园'},
+  {t:'18:30', n:'老城晚餐', d:'Grassmarket 一带，晚上回住处别走小巷'}
+ ],
+ map:{stops:[{k:0,x:18,y:28},{k:1,x:38,y:42},{k:2,x:52,y:54},{k:3,x:78,y:70},{k:4,x:58,y:82}], segs:[[0,1,'walk'],[1,2,'walk'],[2,3,'walk'],[3,4,'walk']]},
+ note:'亚瑟王座登顶改成了山脚的索尔兹伯里峭壁环山路：山顶那段 40 分钟上坡，1 月多冰、风大、天 16:30 就黑，得带头灯和防滑装备。环山路是柏油路，平走 15 分钟就能看到同一片峭壁和全城，看完天没黑就回城。'},
+
+{n:13, d:'1/27', wd:'周三', city:'爱丁堡 → 伦敦', rc:'edi', scene:'planedusk', cap:'Dean Village · Flight to London',
+ title:'迪恩村 · 飞回伦敦', sub:'王子街 → 国家画廊 → LHR',
+ stay:'伦敦',
+ tags:[['hp','《云图》迪恩村'],['','飞行 1 小时 20 分'],['warn','提前 2 小时到机场']],
+ it:[
+  {t:'09:30', n:'王子街 · 迪恩村', d:'从新城下坡走到迪恩村，10 分钟，早上有雾最好看'},
+  {t:'11:00', n:'苏格兰国家画廊', d:'免费，拉斐尔前派那几间别错过'},
+  {t:'13:30', n:'去机场', d:'电车 30 分钟到 EDI，别坐错方向'},
+  {t:'15:30', n:'飞 LHR', d:'1 小时 20 分，比火车省 3 小时'},
+  {t:'18:00', n:'回住处', d:'晚上就近吃个饭'}
+ ],
+ map:{stops:[{k:0,x:16,y:24},{k:1,x:32,y:38},{k:2,x:56,y:60},{k:3,x:82,y:70},{k:4,x:90,y:54}], segs:[[0,1,'walk'],[1,2,'train'],[2,3,'fly'],[3,4,'walk']]},
+ note:'这段坐飞机不坐火车：火车 4 小时 20 分，飞机连安检 2 小时 20 分，还省一晚住宿。'},
+
+{n:14, d:'1/28', wd:'周四', city:'伦敦', rc:'london', scene:'greenwich', cap:'Greenwich · Meridian',
+ title:'格林尼治', sub:'天文台 → 彩绘厅 → 卡蒂萨克号',
+ stay:'伦敦',
+ tags:[['hp','《雷神2》《加勒比海盗4》'],['','DLR 直达，20 分钟'],['ok','比剑桥近得多']],
+ it:[
+  {t:'10:00', n:'格林尼治天文台', d:'本初子午线踩一脚，山上视野好'},
+  {t:'12:00', n:'市场午餐', d:'Covered Market 里的小摊，比景区餐厅划算'},
+  {t:'13:00', n:'旧皇家海军学院 彩绘厅', d:'《雷神2》取景地，免费但开放时间短'},
+  {t:'15:00', n:'卡蒂萨克号', d:'老帆船，外观就够，进去看个人兴趣'},
+  {t:'16:30', n:'回城', d:'DLR 到 Bank 换乘'}
+ ],
+ map:{stops:[{k:0,x:16,y:28},{k:1,x:36,y:46},{k:2,x:56,y:60},{k:3,x:74,y:72},{k:4,x:90,y:50}], segs:[[0,1,'walk'],[1,2,'walk'],[2,3,'walk'],[3,4,'train']]},
+ note:'彩绘厅每天 10:00–17:00，凭票入场，13:00 去光线最好；周四是一周里人最少的一天。'},
+
+{n:15, d:'1/29', wd:'周五', city:'伦敦', rc:'london', scene:'eastend', cap:'Shoreditch · Brick Lane',
+ title:'东区街头', sub:'Shoreditch → Brick Lane → Spitalfields',
+ stay:'伦敦',
+ tags:[['','周五店都开，傍晚人变多'],['','咸牛肉贝果必吃'],['warn','别晚上单独往北走']],
+ it:[
+  {t:'10:00', n:'Shoreditch 街头艺术', d:'Brick Lane 周边巷子全是涂鸦，随走随拍'},
+  {t:'12:00', n:'Beigel Bake', d:'24 小时咸牛肉贝果，5 英镑左右，排队也快'},
+  {t:'13:30', n:'Brick Lane', d:'古着店 + 咖喱街，周日有市集但今天更清静'},
+  {t:'14:30', n:'Spitalfields 市场', d:'老市场棚架，手作和小吃'},
+  {t:'16:30', n:'运河边走一段', d:'往西到 Shoreditch High St 收尾'}
+ ],
+ map:{stops:[{k:0,x:14,y:38},{k:1,x:34,y:52},{k:2,x:50,y:62},{k:3,x:66,y:50},{k:4,x:86,y:64}], segs:[[0,1,'walk'],[1,2,'walk'],[2,3,'walk'],[3,4,'walk']]},
+ note:'这片不用买票、不用预约，纯粹 citywalk，走累了随时钻地铁。'},
+
+{n:16, d:'1/30', wd:'周六', city:'伦敦', rc:'london', scene:'nottinghill', cap:'Portobello · Notting Hill',
+ title:'诺丁山 · 肯辛顿', sub:'Portobello 市集 → 海德公园 → 补货',
+ stay:'伦敦',
+ tags:[['hp','《诺丁山》《帕丁顿熊》'],['ok','周六市集最全'],['warn','市集 17:00 收摊']],
+ it:[
+  {t:'10:00', n:'Portobello 市集', d:'周六古董摊最全，从 Ladbroke Grove 那头往南走'},
+  {t:'14:00', n:'海德公园 · 肯辛顿宫', d:'穿过公园到宫殿，冬天湖上有天鹅'},
+  {t:'16:00', n:'牛津街 · 摄政街 补货', d:'1 月打折最后几天，买伴手礼'},
+  {t:'18:30', n:'回住处 · 打包', d:'大件先收进行李箱，明早不慌'}
+ ],
+ map:{stops:[{k:0,x:12,y:34},{k:1,x:40,y:26},{k:2,x:62,y:44},{k:3,x:86,y:66}], segs:[[0,1,'walk'],[1,2,'walk'],[2,3,'tube']]},
+ note:'市集 17:00 开始收摊，古董摊下午就散，尽量上午去。'},
+
+{n:17, d:'1/31', wd:'周日', city:'伦敦 → 回国', rc:'london', scene:'planenight', cap:'Heathrow · Departure',
+ title:'收尾 · 回程', sub:'收拾 → 希思罗 → 航班',
+ stay:'机上',
+ tags:[['warn','提前 3 小时到机场'],['','退税在 T5 出发层']],
+ it:[
+  {t:'10:00', n:'最后收拾 · 退房', d:'退房、还钥匙，别落充电器'},
+  {t:'13:30', n:'去希思罗', d:'伊丽莎白线 30 分钟，留足退税时间'},
+  {t:'17:00', n:'航班起飞', d:'起飞前 3 小时到，退税柜台排队最久'}
+ ],
+ map:{stops:[{k:0,x:18,y:40},{k:1,x:48,y:58},{k:2,x:80,y:34}], segs:[[0,1,'train'],[1,2,'fly']]},
+ note:'退税单在购物时就要开好，机场只盖章；现金退税比退卡慢但当场拿到。'},
+
+{n:18, d:'2/1', wd:'周一', city:'抵达国内', rc:'london', scene:'done', cap:'Home',
+ title:'回到国内', sub:'18 天 17 晚 · 结束',
+ stay:'—',
+ tags:[['ok','18 天 17 晚 · 结束']],
+ it:[
+  {t:'—', n:'抵达', d:'时差往回调 8 小时，第一天别安排工作'}
+ ],
+ map:{stops:[{k:0,x:50,y:50}], segs:[]},
+ note:'回程后建议留一天缓冲再上班，18 天连轴转的疲劳会在第三天集中爆发。'}
+];
+
+/* 花费概览（用于总览页） */
+const BUDGET = [
+ ['机票（往返伦敦）','4,500 – 6,500'],
+ ['住宿（3 晚）','1,500 – 2,000'],
+ ['城际交通 + 一日游','3,000'],
+ ['门票 + 预约','1,500 – 2,200'],
+ ['餐饮 17 天','7,000 – 8,000'],
+ ['合计（不含购物）','18,300 – 22,800']
+];
+
+/* ============================================================
+   每日插画：纯矢量，无外链、无位图
+   ============================================================ */
+const P = {
+  ink:'#131c25', ink2:'#2b3a47', ink3:'#41525f',
+  cream:'#f5efe2', white:'#fffdf6', stone:'#c9bda3', stone2:'#ad9f84',
+  brick:'#a3352b', moss:'#6d7c3c', slate:'#3f556c', brass:'#a8822f'
+};
+
+function SV(id, s1, s2, body){
+  return '<svg class="scene" viewBox="0 0 400 220" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">'
+    + '<defs><linearGradient id="sk_' + id + '" x1="0" y1="0" x2="0.25" y2="1">'
+    + '<stop offset="0" stop-color="' + s1 + '"/><stop offset="1" stop-color="' + s2 + '"/>'
+    + '</linearGradient></defs>'
+    + '<rect width="400" height="220" fill="url(#sk_' + id + ')"/>' + body + '</svg>';
+}
+
+const SCENES = {};
+
+/* 1 · 抵达 */
+SCENES.arrive = SV('arrive', '#f3dcb6', '#e2bd8d',
+  '<circle cx="304" cy="66" r="30" fill="#e8b06a" opacity=".85"/>'
+  + '<circle cx="304" cy="66" r="44" fill="none" stroke="#e8b06a" stroke-width=".8" opacity=".5"/>'
+  + '<path d="M0 96 Q90 60 176 74" fill="none" stroke="#fffdf6" stroke-width="1.4" stroke-dasharray="4 5" opacity=".85"/>'
+  + '<g transform="translate(150 66) rotate(-8)">'
+  + '<path d="M0 0 L40 4 L0 8 L10 4 Z" fill="' + P.ink + '"/>'
+  + '<path d="M16 3 L30 -12 L35 -9 L24 4 Z" fill="' + P.ink + '"/>'
+  + '<path d="M8 6 L2 15 L0 14 L5 6 Z" fill="' + P.ink + '"/></g>'
+  + '<g fill="' + P.ink2 + '">'
+  + '<rect x="0" y="150" width="26" height="70"/><rect x="26" y="132" width="20" height="88"/>'
+  + '<rect x="46" y="158" width="22" height="62"/><rect x="68" y="118" width="18" height="102"/>'
+  + '<rect x="86" y="146" width="24" height="74"/><rect x="110" y="126" width="16" height="94"/>'
+  + '<rect x="126" y="160" width="26" height="60"/><rect x="152" y="138" width="20" height="82"/>'
+  + '<rect x="172" y="112" width="18" height="108"/><rect x="190" y="150" width="26" height="70"/>'
+  + '<rect x="216" y="130" width="22" height="90"/><rect x="238" y="158" width="18" height="62"/>'
+  + '<rect x="256" y="140" width="24" height="80"/><rect x="280" y="120" width="18" height="100"/>'
+  + '<rect x="298" y="152" width="22" height="68"/><rect x="320" y="134" width="20" height="86"/>'
+  + '<rect x="340" y="160" width="24" height="60"/><rect x="364" y="142" width="36" height="78"/></g>'
+  + '<rect x="0" y="205" width="400" height="15" fill="' + P.ink + '" opacity=".9"/>'
+  + '<line x1="185" y1="112" x2="185" y2="96" stroke="' + P.ink2 + '" stroke-width="1.2"/>'
+  + '<circle cx="185" cy="94" r="1.6" fill="#e8b06a"/>');
+
+/* 2 · 西敏 */
+SCENES.westminster = SV('westminster', '#dfe7ec', '#c3cdd6',
+  '<g fill="#fffdf6" opacity=".75"><ellipse cx="90" cy="44" rx="46" ry="14"/>'
+  + '<ellipse cx="128" cy="50" rx="30" ry="10"/><ellipse cx="300" cy="34" rx="52" ry="15"/></g>'
+  + '<g fill="' + P.stone + '"><rect x="70" y="140" width="300" height="46"/></g>'
+  + '<g fill="' + P.stone2 + '">' + [0,1,2,3,4,5,6,7,8,9,10,11,12].map(function(i){
+      return '<rect x="' + (78 + i*22) + '" y="150" width="11" height="16"/>';
+    }).join('') + '</g>'
+  + '<g fill="' + P.stone + '"><rect x="70" y="128" width="300" height="12"/></g>'
+  + '<g fill="' + P.stone2 + '">' + [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14].map(function(i){
+      return '<rect x="' + (74 + i*20) + '" y="118" width="6" height="10"/>';
+    }).join('') + '</g>'
+  + '<g fill="' + P.stone + '">'
+  + '<rect x="34" y="86" width="36" height="100"/>'
+  + '<rect x="30" y="80" width="44" height="8"/>'
+  + '<path d="M30 80 L52 40 L74 80 Z"/></g>'
+  + '<circle cx="52" cy="98" r="13" fill="' + P.white + '"/>'
+  + '<circle cx="52" cy="98" r="13" fill="none" stroke="' + P.stone2 + '" stroke-width="1.6"/>'
+  + '<line x1="52" y1="98" x2="52" y2="90" stroke="' + P.ink + '" stroke-width="1.4"/>'
+  + '<line x1="52" y1="98" x2="58" y2="100" stroke="' + P.ink + '" stroke-width="1.4"/>'
+  + '<rect x="0" y="186" width="400" height="34" fill="#8ea3b1"/>'
+  + '<g stroke="#fffdf6" stroke-width="1" opacity=".55">'
+  + '<line x1="20" y1="196" x2="90" y2="196"/><line x1="120" y1="204" x2="210" y2="204"/>'
+  + '<line x1="250" y1="194" x2="330" y2="194"/><line x1="300" y1="210" x2="380" y2="210"/></g>');
+
+/* 3 · 金融城 */
+SCENES.city = SV('city', '#d8e2e7', '#b9c7cf',
+  '<g fill="' + P.ink3 + '" opacity=".85">'
+  + '<rect x="252" y="96" width="26" height="86"/><rect x="286" y="66" width="34" height="116"/>'
+  + '<rect x="328" y="110" width="22" height="72"/><rect x="358" y="84" width="30" height="98"/></g>'
+  + '<g fill="' + P.ink2 + '"><rect x="24" y="126" width="130" height="56"/></g>'
+  + '<rect x="60" y="96" width="58" height="32" fill="' + P.ink2 + '"/>'
+  + '<path d="M62 96 Q89 56 116 96 Z" fill="' + P.ink3 + '"/>'
+  + '<rect x="86" y="50" width="4" height="12" fill="' + P.ink2 + '"/>'
+  + '<line x1="90" y1="52" x2="98" y2="56" stroke="' + P.ink2 + '" stroke-width="1.2"/>'
+  + '<g fill="' + P.cream + '" opacity=".5">'
+  + '<rect x="30" y="136" width="6" height="12"/><rect x="42" y="136" width="6" height="12"/>'
+  + '<rect x="54" y="136" width="6" height="12"/><rect x="118" y="136" width="6" height="12"/>'
+  + '<rect x="130" y="136" width="6" height="12"/></g>'
+  + '<rect x="0" y="170" width="400" height="50" fill="#93a8b2"/>'
+  + '<g stroke="' + P.ink2 + '" stroke-width="1.6" fill="none">'
+  + '<path d="M12 178 H250"/><path d="M12 178 L48 166"/><path d="M250 178 L212 166"/></g>'
+  + '<g stroke="' + P.ink2 + '" stroke-width=".7" opacity=".7">'
+  + [0,1,2,3,4,5].map(function(i){ return '<line x1="' + (30 + i*38) + '" y1="168" x2="' + (30 + i*38) + '" y2="178"/>'; }).join('')
+  + '</g>'
+  + '<g stroke="#fffdf6" stroke-width="1" opacity=".4">'
+  + '<line x1="20" y1="196" x2="120" y2="196"/><line x1="180" y1="206" x2="300" y2="206"/></g>');
+
+/* 4 · 博物馆 */
+SCENES.museum = SV('museum', '#f2e7cd', '#e3d3b0',
+  '<circle cx="330" cy="52" r="22" fill="#e9c479" opacity=".7"/>'
+  + '<g fill="' + P.stone + '"><path d="M96 92 L200 50 L304 92 Z"/></g>'
+  + '<g fill="' + P.stone2 + '"><path d="M120 90 L200 58 L280 90 Z" opacity=".45"/></g>'
+  + '<rect x="96" y="92" width="208" height="10" fill="' + P.stone2 + '"/>'
+  + '<g fill="' + P.stone + '">' + [0,1,2,3,4,5].map(function(i){
+      return '<rect x="' + (108 + i*34) + '" y="102" width="18" height="68"/>';
+    }).join('') + '</g>'
+  + '<g fill="' + P.stone2 + '">' + [0,1,2,3,4,5].map(function(i){
+      return '<rect x="' + (104 + i*34) + '" y="102" width="4" height="68"/>';
+    }).join('') + '</g>'
+  + '<rect x="96" y="170" width="208" height="8" fill="' + P.stone2 + '"/>'
+  + '<rect x="88" y="178" width="224" height="8" fill="' + P.stone2 + '" opacity=".8"/>'
+  + '<rect x="0" y="186" width="400" height="34" fill="#cbbda1"/>'
+  + '<g fill="' + P.moss + '" opacity=".45"><circle cx="44" cy="176" r="16"/><circle cx="66" cy="182" r="12"/>'
+  + '<circle cx="352" cy="178" r="15"/></g>'
+  + '<rect x="44" y="186" width="2" height="10" fill="#7b6a4c"/>');
+
+/* 5 · 国王十字 */
+SCENES.kingscross = SV('kingscross', '#e0c9a4', '#c9ab84',
+  '<g fill="#9c6a4e"><rect x="34" y="62" width="332" height="108"/></g>'
+  + '<g stroke="#b98a68" stroke-width=".7" opacity=".8">'
+  + [0,1,2,3,4,5,6,7].map(function(i){ return '<line x1="34" y1="' + (74 + i*12) + '" x2="366" y2="' + (74 + i*12) + '"/>'; }).join('')
+  + '</g>'
+  + '<path d="M120 170 V120 Q200 62 280 120 V170 Z" fill="#8a5b41"/>'
+  + '<path d="M120 170 V120 Q200 62 280 120 V170" fill="none" stroke="' + P.cream + '" stroke-width="2" opacity=".7"/>'
+  + '<circle cx="200" cy="98" r="15" fill="' + P.cream + '"/>'
+  + '<circle cx="200" cy="98" r="15" fill="none" stroke="' + P.brass + '" stroke-width="2"/>'
+  + '<line x1="200" y1="98" x2="200" y2="88" stroke="' + P.ink + '" stroke-width="1.4"/>'
+  + '<line x1="200" y1="98" x2="207" y2="101" stroke="' + P.ink + '" stroke-width="1.4"/>'
+  + '<g fill="#6f4632"><rect x="88" y="140" width="24" height="30"/><rect x="288" y="140" width="24" height="30"/></g>'
+  + '<rect x="0" y="170" width="400" height="50" fill="#7a6a58"/>'
+  + '<g fill="' + P.ink2 + '"><rect x="52" y="176" width="230" height="26" rx="4"/></g>'
+  + '<path d="M282 176 h30 a13 13 0 0 1 0 26 h-30 Z" fill="' + P.ink2 + '"/>'
+  + '<g fill="' + P.cream + '" opacity=".85">'
+  + [0,1,2,3,4,5].map(function(i){ return '<rect x="' + (64 + i*34) + '" y="184" width="22" height="9" rx="1"/>'; }).join('')
+  + '</g>'
+  + '<g stroke="' + P.cream + '" stroke-width="1.2" opacity=".5">'
+  + '<line x1="0" y1="210" x2="400" y2="210"/></g>'
+  + '<g fill="' + P.brass + '"><rect x="30" y="34" width="4" height="28"/><rect x="366" y="34" width="4" height="28"/></g>'
+  + '<g fill="' + P.cream + '" opacity=".55"><rect x="34" y="38" width="14" height="20"/><rect x="350" y="38" width="20" height="20"/></g>');
+
+/* 6 · 牛津 */
+SCENES.oxford = SV('oxford', '#e8e2d1', '#cfc7b0',
+  '<g fill="' + P.stone2 + '" opacity=".8">'
+  + '<rect x="18" y="118" width="42" height="62"/><path d="M18 118 L39 84 L60 118 Z"/></g>'
+  + '<g fill="' + P.stone + '">'
+  + '<rect x="96" y="120" width="150" height="58"/>'
+  + '<rect x="112" y="96" width="118" height="26"/>'
+  + '<path d="M112 96 Q171 44 230 96 Z"/></g>'
+  + '<g fill="' + P.stone2 + '" opacity=".55"><path d="M126 94 Q171 56 216 94 Z"/></g>'
+  + '<rect x="166" y="46" width="6" height="14" fill="' + P.stone2 + '"/>'
+  + '<g fill="' + P.stone2 + '">' + [0,1,2,3,4,5,6].map(function(i){
+      return '<rect x="' + (104 + i*20) + '" y="104" width="7" height="16"/>';
+    }).join('') + '</g>'
+  + '<g fill="' + P.ink2 + '" opacity=".7">' + [0,1,2,3,4].map(function(i){
+      return '<path d="M' + (110 + i*32) + ' 178 v-24 a9 9 0 0 1 18 0 v24 Z"/>';
+    }).join('') + '</g>'
+  + '<g fill="' + P.stone2 + '" opacity=".75"><rect x="266" y="128" width="34" height="52"/>'
+  + '<path d="M266 128 L283 100 L300 128 Z"/></g>'
+  + '<g fill="' + P.stone2 + '" opacity=".6"><rect x="318" y="140" width="26" height="40"/>'
+  + '<path d="M318 140 L331 116 L344 140 Z"/></g>'
+  + '<rect x="0" y="178" width="400" height="42" fill="#bdb096"/>'
+  + '<g stroke="#a89a80" stroke-width=".8" opacity=".7">'
+  + '<line x1="0" y1="192" x2="400" y2="192"/><line x1="0" y1="206" x2="400" y2="206"/></g>');
+
+/* 7 · 剑桥 */
+SCENES.cambridge = SV('cambridge', '#dbe4e6', '#b9c9cd',
+  '<circle cx="322" cy="54" r="22" fill="#f0e6cc" opacity=".75"/>'
+  + '<g fill="#fffdf6" opacity=".5"><ellipse cx="86" cy="42" rx="44" ry="11"/>'
+  + '<ellipse cx="196" cy="30" rx="30" ry="8"/></g>'
+  /* 远景学院塔楼 */
+  + '<g fill="' + P.stone2 + '" opacity=".55">'
+  + '<rect x="18" y="104" width="34" height="66"/><path d="M18 104 L35 82 L52 104 Z"/>'
+  + '<rect x="352" y="112" width="30" height="58"/><path d="M352 112 L367 92 L382 112 Z"/></g>'
+  /* 国王学院礼拜堂 */
+  + '<g fill="' + P.stone + '">'
+  + '<rect x="122" y="96" width="156" height="76"/>'
+  + '<path d="M122 96 L200 62 L278 96 Z"/>'
+  + '<rect x="146" y="92" width="108" height="6" fill="' + P.stone2 + '" opacity=".55"/></g>'
+  + '<g fill="' + P.stone2 + '">'
+  + '<rect x="126" y="58" width="8" height="20"/><rect x="266" y="58" width="8" height="20"/>'
+  + '<rect x="160" y="70" width="7" height="16"/><rect x="233" y="70" width="7" height="16"/>'
+  + '<rect x="196" y="44" width="8" height="18"/></g>'
+  + '<g fill="' + P.cream + '" opacity=".85">'
+  + [0,1,2,3,4,5].map(function(i){ return '<path d="M' + (134 + i*24) + ' 166 v-48 a10 12 0 0 1 20 0 v48 Z"/>'; }).join('')
+  + '</g>'
+  /* 石桥 */
+  + '<g fill="#c5b9a0">'
+  + '<rect x="0" y="176" width="400" height="14"/>'
+  + '<path d="M0 190 h400 v14 h-400 Z" opacity=".9"/></g>'
+  + '<g fill="#8d8269" opacity=".55">'
+  + '<path d="M54 204 v-10 a16 14 0 0 1 32 0 v10 Z"/>'
+  + '<path d="M168 204 v-10 a16 14 0 0 1 32 0 v10 Z"/>'
+  + '<path d="M282 204 v-10 a16 14 0 0 1 32 0 v10 Z"/></g>'
+  /* 冰河 */
+  + '<rect x="0" y="204" width="400" height="16" fill="#6d8791"/>'
+  + '<g stroke="#fffdf6" stroke-width="1.1" opacity=".55">'
+  + '<path d="M0 210 q26 -4 52 0 t52 0"/><path d="M210 214 q26 -4 52 0 t52 0"/></g>'
+  /* 撑篙的船 */
+  + '<g transform="translate(0,13)"><path d="M96 200 q34 12 84 0 q-14 10 -42 10 q-28 0 -42 -10 Z" fill="' + P.ink2 + '"/>'
+  + '<rect x="112" y="192" width="52" height="8" rx="3" fill="' + P.brass + '"/>'
+  + '<circle cx="132" cy="182" r="5" fill="' + P.ink + '"/>'
+  + '<rect x="129" y="186" width="7" height="12" rx="3" fill="' + P.ink + '"/>'
+  + '<line x1="152" y1="200" x2="176" y2="150" stroke="' + P.stone2 + '" stroke-width="2"/></g>'
+  /* 冬树 */
+  + '<g stroke="' + P.ink2 + '" stroke-width="1.6" fill="none" opacity=".55">'
+  + '<path d="M40 176 v-40 M40 148 l-12 -14 M40 156 l12 -16 M40 138 l-7 -12"/>'
+  + '<path d="M352 176 v-34 M352 152 l10 -12 M352 158 l-10 -12"/></g>'
+  + '<g fill="' + P.moss + '" opacity=".35"><rect x="0" y="168" width="400" height="8"/></g>');
+
+/* 8 · 温莎 */
+SCENES.windsor = SV('windsor', '#dbe4ea', '#bccbd4',
+  '<g fill="#fffdf6" opacity=".6"><ellipse cx="70" cy="46" rx="42" ry="12"/><ellipse cx="320" cy="38" rx="34" ry="10"/></g>'
+  + '<g fill="' + P.stone2 + '"><rect x="20" y="120" width="150" height="60"/></g>'
+  + '<g fill="' + P.stone + '">'
+  + '<rect x="182" y="88" width="92" height="92"/>'
+  + '<rect x="176" y="78" width="104" height="14"/>'
+  + '<rect x="196" y="62" width="26" height="18"/><rect x="234" y="62" width="26" height="18"/></g>'
+  + '<g fill="' + P.stone2 + '">' + [0,1,2,3,4,5,6,7,8,9].map(function(i){
+      return '<rect x="' + (180 + i*11) + '" y="70" width="6" height="8"/>';
+    }).join('') + '</g>'
+  + '<g fill="' + P.ink3 + '" opacity=".75">' + [0,1,2,3,4,5,6,7,8,9,10,11].map(function(i){
+      return '<rect x="' + (30 + i*11) + '" y="112" width="6" height="8"/>';
+    }).join('') + '</g>'
+  + '<g fill="' + P.ink3 + '" opacity=".55">' + [0,1,2,3].map(function(i){
+      return '<rect x="' + (200 + i*18) + '" y="106" width="8" height="14"/>';
+    }).join('') + '</g>'
+  + '<path d="M228 74 V40" stroke="' + P.ink2 + '" stroke-width="1.5"/>'
+  + '<path d="M228 40 l22 6 l-22 8 Z" fill="' + P.brick + '"/>'
+  + '<rect x="0" y="180" width="400" height="40" fill="#a8b7a0"/>'
+  + '<g fill="' + P.moss + '" opacity=".55"><circle cx="42" cy="176" r="15"/><circle cx="66" cy="182" r="10"/>'
+  + '<circle cx="300" cy="178" r="13"/></g>'
+  + '<path d="M0 180 h400" stroke="#8f9f88" stroke-width="1"/>');
+
+/* 9 · 比斯特 */
+SCENES.bicester = SV('bicester', '#e6dcea', '#cbbece',
+  '<g fill="#fdf8ee"><rect x="0" y="130" width="120" height="60"/></g>'
+  + '<path d="M0 130 L60 104 L120 130 Z" fill="' + P.brick + '" opacity=".8"/>'
+  + '<g fill="#fdf8ee"><rect x="286" y="126" width="114" height="64"/></g>'
+  + '<path d="M286 126 L344 100 L400 126 Z" fill="' + P.slate + '" opacity=".75"/>'
+  + '<g fill="' + P.ink2 + '" opacity=".55">'
+  + '<rect x="18" y="146" width="26" height="30"/><rect x="62" y="146" width="26" height="30"/>'
+  + '<rect x="308" y="142" width="26" height="30"/><rect x="352" y="142" width="26" height="30"/></g>'
+  + '<g fill="' + P.cream + '"><rect x="120" y="146" width="160" height="44"/></g>'
+  + '<path d="M120 146 L200 118 L280 146" fill="none" stroke="' + P.brass + '" stroke-width="2"/>'
+  + '<circle cx="200" cy="118" r="3" fill="' + P.brass + '"/>'
+  + '<g fill="' + P.ink2 + '" opacity=".6"><rect x="132" y="158" width="34" height="24"/>'
+  + '<rect x="184" y="158" width="34" height="24"/><rect x="236" y="158" width="34" height="24"/></g>'
+  + '<path d="M70 96 Q140 116 200 100 T340 92" fill="none" stroke="' + P.ink2 + '" stroke-width="1" opacity=".6"/>'
+  + '<g fill="' + P.brick + '">'
+  + '<path d="M96 96 l6 8 l-6 8 l-6 -8 Z"/><path d="M140 104 l6 8 l-6 8 l-6 -8 Z"/>'
+  + '<path d="M186 104 l6 8 l-6 8 l-6 -8 Z"/><path d="M232 100 l6 8 l-6 8 l-6 -8 Z"/>'
+  + '<path d="M278 96 l6 8 l-6 8 l-6 -8 Z"/></g>'
+  + '<rect x="0" y="190" width="400" height="30" fill="#b3a794"/>'
+  + '<g stroke="#cfc4ac" stroke-width=".9">'
+  + '<line x1="0" y1="203" x2="400" y2="203"/><line x1="0" y1="214" x2="400" y2="214"/></g>');
+
+/* 10 · 达西庄园 */
+SCENES.manor = SV('manor', '#e4e7dc', '#c6cdbd',
+  '<g fill="#fffdf6" opacity=".55"><ellipse cx="90" cy="40" rx="46" ry="12"/></g>'
+  + '<g fill="' + P.moss + '" opacity=".45"><circle cx="52" cy="120" r="26"/><circle cx="86" cy="126" r="20"/>'
+  + '<circle cx="336" cy="118" r="24"/></g>'
+  + '<g fill="' + P.stone + '">'
+  + '<rect x="96" y="112" width="208" height="58"/>'
+  + '<rect x="150" y="90" width="100" height="24"/></g>'
+  + '<path d="M150 90 L200 70 L250 90 Z" fill="' + P.stone2 + '"/>'
+  + '<g fill="' + P.stone2 + '" opacity=".6"><rect x="80" y="122" width="18" height="48"/>'
+  + '<rect x="302" y="122" width="18" height="48"/></g>'
+  + '<g fill="' + P.ink3 + '" opacity=".5">' + [0,1,2,3,4,5,6,7,8].map(function(i){
+      return '<rect x="' + (108 + i*22) + '" y="128" width="9" height="15"/>';
+    }).join('') + '</g>'
+  + '<g fill="' + P.ink3 + '" opacity=".4">' + [0,1,2].map(function(i){
+      return '<rect x="' + (162 + i*26) + '" y="98" width="9" height="12"/>';
+    }).join('') + '</g>'
+  + '<rect x="0" y="170" width="400" height="20" fill="#a9b394"/>'
+  + '<ellipse cx="200" cy="196" rx="150" ry="22" fill="#93a7a5"/>'
+  + '<g stroke="#fffdf6" stroke-width="1" opacity=".45">'
+  + '<line x1="120" y1="194" x2="180" y2="194"/><line x1="210" y1="200" x2="270" y2="200"/></g>'
+  + '<g stroke="' + P.stone2 + '" stroke-width="1" opacity=".5">'
+  + '<line x1="112" y1="170" x2="112" y2="190"/><line x1="288" y1="170" x2="288" y2="190"/></g>');
+
+/* 11 · 北上列车 */
+SCENES.north = SV('north', '#e9dcc4', '#c2b49c',
+  '<circle cx="308" cy="88" r="26" fill="#f6e8c4"/>'
+  + '<circle cx="308" cy="88" r="42" fill="#f6e8c4" opacity=".22"/>'
+  /* 远山 */
+  + '<path d="M0 128 L46 100 L88 118 L128 92 L172 116 L212 98 L400 104 L400 150 L0 150 Z" fill="#9aa08a" opacity=".55"/>'
+  /* 高架桥 */
+  + '<rect x="0" y="132" width="400" height="20" fill="#c9bda3"/>'
+  + '<rect x="0" y="132" width="400" height="5" fill="#ded2b8"/>'
+  + '<g fill="#b2a78e">'
+  + '<rect x="26" y="152" width="16" height="56"/><rect x="100" y="152" width="16" height="56"/>'
+  + '<rect x="174" y="152" width="16" height="56"/><rect x="248" y="152" width="16" height="56"/>'
+  + '<rect x="322" y="152" width="16" height="56"/></g>'
+  + '<g fill="none" stroke="#c9bda3" stroke-width="7">'
+  + '<path d="M42 158 a22 22 0 0 1 58 0"/><path d="M116 158 a22 22 0 0 1 58 0"/>'
+  + '<path d="M190 158 a22 22 0 0 1 58 0"/><path d="M264 158 a22 22 0 0 1 58 0"/></g>'
+  /* 列车 */
+  + '<g><rect x="52" y="108" width="200" height="24" rx="8" fill="' + P.slate + '"/>'
+  + '<rect x="52" y="108" width="200" height="8" rx="4" fill="' + P.ink2 + '"/>'
+  + [0,1,2,3,4,5,6].map(function(i){ return '<rect x="' + (60 + i*27) + '" y="118" width="18" height="8" rx="2" fill="#efe4c8"/>'; }).join('')
+  + '<rect x="252" y="112" width="16" height="16" rx="4" fill="' + P.ink + '"/>'
+  + '<circle cx="264" cy="122" r="2.6" fill="#f7e6bc"/>'
+  + '<rect x="96" y="98" width="10" height="10" rx="2" fill="' + P.ink3 + '"/>'
+  + '<rect x="186" y="98" width="10" height="10" rx="2" fill="' + P.ink3 + '"/></g>'
+  /* 前景田野 */
+  + '<rect x="0" y="196" width="400" height="24" fill="#7f8a63"/>'
+  + '<g stroke="#65704f" stroke-width="1" opacity=".7">'
+  + '<path d="M0 206 h400"/><path d="M0 214 h400"/></g>'
+  /* 鸟 */
+  + '<g stroke="' + P.ink2 + '" stroke-width="1.2" fill="none" opacity=".55">'
+  + '<path d="M330 52 q7 -6 14 0"/><path d="M352 42 q6 -5 12 0"/></g>');
+
+/* 12 · 爱丁堡 */
+SCENES.edinburgh = SV('edinburgh', '#d3dde5', '#aebfc9',
+  '<circle cx="316" cy="52" r="20" fill="#f6f1df" opacity=".9"/>'
+  + '<g fill="#fffdf6" opacity=".45"><ellipse cx="120" cy="70" rx="60" ry="10"/></g>'
+  + '<path d="M60 220 L96 150 L140 132 L196 140 L236 126 L280 148 L316 220 Z" fill="#4d5b46"/>'
+  + '<path d="M96 150 L140 132 L196 140 L196 220 L96 220 Z" fill="#41503d"/>'
+  + '<g fill="' + P.stone + '">'
+  + '<rect x="118" y="96" width="120" height="46"/>'
+  + '<rect x="140" y="76" width="30" height="24"/><rect x="188" y="86" width="26" height="14"/></g>'
+  + '<g fill="' + P.stone2 + '">' + [0,1,2,3,4,5,6,7,8,9].map(function(i){
+      return '<rect x="' + (120 + i*12) + '" y="90" width="6" height="8"/>';
+    }).join('') + '</g>'
+  + '<g fill="' + P.ink3 + '" opacity=".55">' + [0,1,2,3,4].map(function(i){
+      return '<rect x="' + (126 + i*22) + '" y="110" width="7" height="12"/>';
+    }).join('') + '</g>'
+  + '<path d="M155 76 V48" stroke="' + P.ink2 + '" stroke-width="1.4"/>'
+  + '<path d="M155 48 l16 4 l-16 6 Z" fill="' + P.slate + '"/>'
+  + '<g stroke="#8a9aa4" stroke-width="1" opacity=".5">'
+  + '<path d="M0 168 h400"/><path d="M0 182 h400"/></g>');
+
+/* 13 · 黄昏航班 */
+SCENES.planedusk = SV('planedusk', '#e7b9c4', '#8e93b5',
+  '<circle cx="84" cy="60" r="22" fill="#fbe9c8" opacity=".8"/>'
+  + '<g fill="#fffdf6" opacity=".38"><ellipse cx="250" cy="52" rx="58" ry="12"/>'
+  + '<ellipse cx="320" cy="70" rx="40" ry="9"/></g>'
+  + '<path d="M0 150 H400 V220 H0 Z" fill="#6d7398" opacity=".7"/>'
+  + '<g fill="#4f5578">'
+  + '<rect x="24" y="128" width="20" height="24"/><rect x="50" y="118" width="16" height="34"/>'
+  + '<rect x="72" y="134" width="24" height="18"/><rect x="300" y="126" width="18" height="26"/>'
+  + '<rect x="326" y="116" width="22" height="36"/><rect x="354" y="132" width="20" height="20"/></g>'
+  + '<g transform="translate(180 92) rotate(-16)">'
+  + '<path d="M0 0 L46 5 L0 10 L12 5 Z" fill="' + P.ink + '"/>'
+  + '<path d="M18 4 L34 -16 L40 -12 L26 5 Z" fill="' + P.ink + '"/>'
+  + '<path d="M18 5 L34 24 L40 20 L26 5 Z" fill="' + P.ink + '"/></g>'
+  + '<g fill="#f6cf8b"><circle cx="196" cy="70" r="2"/><circle cx="238" cy="60" r="1.6"/></g>'
+  + '<g stroke="#fffdf6" stroke-width="1" opacity=".35">'
+  + '<path d="M0 168 h400"/><path d="M0 186 h400"/></g>');
+
+/* 14 · 格林尼治 */
+SCENES.greenwich = SV('greenwich', '#d6e4e2', '#b2c9c7',
+  '<path d="M0 178 Q90 156 200 150 T400 160 V220 H0 Z" fill="#8fa88f"/>'
+  + '<g fill="' + P.stone + '">'
+  + '<rect x="150" y="106" width="104" height="46"/>'
+  + '<rect x="176" y="88" width="52" height="20"/></g>'
+  + '<path d="M176 88 Q202 60 228 88 Z" fill="' + P.stone2 + '"/>'
+  + '<rect x="198" y="56" width="6" height="10" fill="' + P.stone2 + '"/>'
+  + '<g fill="' + P.stone2 + '">' + [0,1,2,3,4].map(function(i){
+      return '<rect x="' + (158 + i*20) + '" y="114" width="7" height="14"/>';
+    }).join('') + '</g>'
+  + '<g stroke="' + P.brick + '" stroke-width="1.6"><line x1="202" y1="152" x2="202" y2="196"/></g>'
+  + '<g stroke="' + P.brick + '" stroke-width="1.2" opacity=".5">'
+  + '<line x1="120" y1="176" x2="292" y2="186"/></g>'
+  + '<rect x="0" y="196" width="400" height="24" fill="#7f9da4"/>'
+  + '<g stroke="' + P.ink2 + '" stroke-width="1.2" opacity=".7">'
+  + '<path d="M300 196 v-40"/><path d="M318 196 v-30"/><path d="M336 196 v-46"/></g>'
+  + '<g stroke="' + P.ink2 + '" stroke-width="1" opacity=".55">'
+  + '<path d="M292 168 h56"/></g>');
+
+/* 15 · 东区 */
+SCENES.eastend = SV('eastend', '#e3d3c4', '#c3ab98',
+  '<g fill="#8d7a68"><rect x="0" y="60" width="400" height="140"/></g>'
+  + '<g stroke="#7a6857" stroke-width=".9">'
+  + [0,1,2,3,4,5,6,7].map(function(i){ return '<line x1="0" y1="' + (72 + i*16) + '" x2="400" y2="' + (72 + i*16) + '"/>'; }).join('')
+  + '</g>'
+  + '<g opacity=".9">'
+  + '<path d="M24 128 q18 -34 36 -12 q14 18 30 4 q10 26 -18 30 l-44 4 q-16 -12 -4 -26 Z" fill="' + P.brick + '"/>'
+  + '<path d="M120 108 q16 -26 30 -6 q16 22 34 2 l6 24 -70 8 Z" fill="' + P.slate + '"/>'
+  + '<path d="M250 132 q22 -30 42 -6 q18 22 34 -2 l6 26 -90 6 Z" fill="' + P.moss + '"/></g>'
+  + '<g fill="' + P.cream + '" opacity=".85"><rect x="150" y="150" width="46" height="10" rx="2"/>'
+  + '<rect x="206" y="150" width="30" height="10" rx="2"/></g>'
+  + '<g fill="' + P.ink + '"><path d="M336 200 v-56 h4 v56 Z"/>'
+  + '<path d="M336 146 q0 -12 14 -12 q-8 6 -8 12 Z"/></g>'
+  + '<circle cx="338" cy="144" r="3" fill="' + P.brass + '"/>'
+  + '<rect x="0" y="198" width="400" height="22" fill="#8c8274"/>'
+  + '<g stroke="#b3a99a" stroke-width="1"><line x1="0" y1="209" x2="400" y2="209"/></g>');
+
+/* 16 · 诺丁山 */
+SCENES.nottinghill = SV('nottinghill', '#efe4da', '#dbc9bd',
+  '<g fill="#fdf9f1"><rect x="0" y="60" width="400" height="140"/></g>'
+  + '<g>' + [0,1,2,3,4].map(function(i){
+      var x = 12 + i*78, c = ['#c98b7a','#9fb0a2','#cfb87f','#a9a1b8','#c3a08c'][i];
+      return '<rect x="' + x + '" y="96" width="66" height="104" fill="' + c + '"/>'
+        + '<path d="M' + (x-4) + ' 96 L' + (x+33) + ' 72 L' + (x+70) + ' 96 Z" fill="' + P.ink2 + '" opacity=".28"/>'
+        + '<rect x="' + (x+10) + '" y="112" width="16" height="20" fill="' + P.cream + '" opacity=".9"/>'
+        + '<rect x="' + (x+40) + '" y="112" width="16" height="20" fill="' + P.cream + '" opacity=".9"/>'
+        + '<rect x="' + (x+24) + '" y="152" width="18" height="48" fill="' + P.ink2 + '" opacity=".7"/>'
+        + '<circle cx="' + (x+38) + '" cy="176" r="1.6" fill="' + P.brass + '"/>'
+        + '<rect x="' + (x+44) + '" y="88" width="6" height="10" fill="' + P.brick + '" opacity=".6"/>';
+    }).join('') + '</g>'
+  + '<rect x="0" y="196" width="400" height="24" fill="#a99c8e"/>'
+  + '<g stroke="#8d8175" stroke-width="1"><line x1="0" y1="208" x2="400" y2="208"/></g>'
+  + '<g fill="' + P.ink2 + '" opacity=".55"><rect x="150" y="186" width="100" height="6" rx="2"/></g>');
+
+/* 17 · 夜航 */
+SCENES.planenight = SV('planenight', '#1e2a3d', '#0f1722',
+  '<g fill="#fffdf6">' + [18,42,68,96,128,160,196,224,252,286,318,352,378].map(function(x, i){
+      var y = [26,52,34,18,44,26,58,36,20,48,30,54,24][i];
+      return '<circle cx="' + x + '" cy="' + y + '" r="' + (i % 3 === 0 ? 1.6 : 1) + '" opacity=".8"/>';
+    }).join('') + '</g>'
+  + '<circle cx="332" cy="44" r="18" fill="#f4ecd8" opacity=".95"/>'
+  + '<circle cx="326" cy="40" r="16" fill="#1b2637"/>'
+  + '<g transform="translate(120 108) rotate(-14)">'
+  + '<path d="M0 0 L52 6 L0 12 L14 6 Z" fill="#e8e2d2"/>'
+  + '<path d="M20 5 L38 -18 L45 -14 L29 6 Z" fill="#e8e2d2"/>'
+  + '<path d="M20 6 L38 30 L45 26 L29 6 Z" fill="#d8d2c2"/></g>'
+  + '<g fill="#e8b06a"><circle cx="128" cy="102" r="2"/><circle cx="176" cy="94" r="2"/>'
+  + '<circle cx="150" cy="122" r="1.6"/></g>'
+  + '<g fill="#c94a3a"><circle cx="98" cy="118" r="1.6"/><circle cx="184" cy="104" r="1.6"/></g>'
+  + '<rect x="0" y="176" width="400" height="44" fill="#16202c"/>'
+  + '<g stroke="#e8b06a" stroke-width="2" opacity=".75">'
+  + [0,1,2,3,4,5].map(function(i){ return '<line x1="' + (28 + i*70) + '" y1="206" x2="' + (58 + i*70) + '" y2="206"/>'; }).join('')
+  + '</g>');
+
+/* 18 · 结束 */
+SCENES.done = SV('done', '#f6f0e0', '#e8ddc4',
+  '<g stroke="' + P.brass + '" fill="none">'
+  + '<circle cx="200" cy="104" r="60" stroke-width="1.2" opacity=".7"/>'
+  + '<circle cx="200" cy="104" r="46" stroke-dasharray="2 5" stroke-width="1" opacity=".6"/></g>'
+  + '<g fill="' + P.ink + '" opacity=".85">'
+  + '<path d="M200 54 l8 42 l-8 8 l-8 -8 Z"/>'
+  + '<path d="M200 154 l-8 -42 l8 -8 l8 8 Z" opacity=".55"/>'
+  + '<path d="M150 104 l42 -8 l8 8 l-8 8 Z" opacity=".55"/>'
+  + '<path d="M250 104 l-42 8 l-8 -8 l8 -8 Z" opacity=".55"/></g>'
+  + '<circle cx="200" cy="104" r="4" fill="' + P.brick + '"/>'
+  + '<text x="200" y="196" text-anchor="middle" font-family="Georgia,serif" font-size="12" '
+  + 'letter-spacing="6" fill="' + P.stone2 + '">JOURNEY ENDS</text>'
+  + '<g stroke="' + P.stone2 + '" stroke-width="1" opacity=".5">'
+  + '<line x1="120" y1="208" x2="180" y2="208"/><line x1="220" y1="208" x2="280" y2="208"/></g>');
+
+/* ============================================================
+   渲染 + 翻页
+   ============================================================ */
+const RC = {london:'var(--london)', peak:'var(--peak)', edi:'var(--edi)'};
+const MODE_LABEL = {walk:'步行', tube:'地铁', train:'火车', bus:'公交', taxi:'打车', fly:'飞机'};
+const MODE_DASH = {walk:'3 4', tube:'', train:'9 5', bus:'2 5', taxi:'6 3', fly:'1 5'};
+const MODE_W = {walk:1.4, tube:2.2, train:2.2, bus:1.8, taxi:1.8, fly:2.4};
+const MODE_C = {walk:'#8a939c', tube:'#2b3a47', train:'#a3352b', bus:'#6d7c3c', taxi:'#6d7c3c', fly:'#a8822f'};
+
+const $stage = document.getElementById('stage');
+const $tape  = document.getElementById('tape');
+const $prog  = document.getElementById('prog');
+const $cnt   = document.getElementById('cnt');
+const $prev  = document.getElementById('prev');
+const $next  = document.getElementById('next');
+
+function shortName(s){
+  var p = String(s).split(/[ ·]+/);
+  return p[0];
+}
+
+/* ---------- 单日路线示意图 ---------- */
+function mapSVG(day){
+  var rc = RC[day.rc] || 'var(--london)';
+  var stops = (day.map && day.map.stops) || [];
+  var segs  = (day.map && day.map.segs) || [];
+  var px = function(v){ return 20 + v / 100 * 360; };
+  var py = function(v){ return 12 + v / 100 * 150; };
+
+  var grid = '';
+  for (var gx = 0; gx <= 400; gx += 40){
+    grid += '<line x1="' + gx + '" y1="0" x2="' + gx + '" y2="180" stroke="#131c25" stroke-width=".4" opacity=".07"/>';
+  }
+  for (var gy = 0; gy <= 180; gy += 30){
+    grid += '<line x1="0" y1="' + gy + '" x2="400" y2="' + gy + '" stroke="#131c25" stroke-width=".4" opacity=".07"/>';
+  }
+
+  var paths = '';
+  var modesUsed = {};
+  segs.forEach(function(sg){
+    var a = stops[sg[0]], b = stops[sg[1]];
+    if (!a || !b) return;
+    var m = sg[2] || 'walk';
+    modesUsed[m] = 1;
+    paths += '<line x1="' + px(a.x) + '" y1="' + py(a.y) + '" x2="' + px(b.x) + '" y2="' + py(b.y) + '" '
+      + 'stroke="' + MODE_C[m] + '" stroke-width="' + MODE_W[m] + '" '
+      + (MODE_DASH[m] ? 'stroke-dasharray="' + MODE_DASH[m] + '" ' : '')
+      + 'stroke-linecap="round" opacity=".9"/>';
+  });
+
+  var nodes = '', nums = {};
+  stops.forEach(function(s, i){
+    nums[s.k] = i + 1;
+    var cx = px(s.x), cy = py(s.y);
+    var label = shortName((day.it[s.k] || {}).n || '');
+    var anchor = s.x > 68 ? 'end' : (s.x < 32 ? 'start' : 'middle');
+    var ly = (i % 2 === 0) ? cy - 13 : cy + 21;
+    nodes += '<circle cx="' + cx + '" cy="' + cy + '" r="10" fill="#fffdf6"/>'
+      + '<circle cx="' + cx + '" cy="' + cy + '" r="9" fill="' + rc + '"/>'
+      + '<text x="' + cx + '" y="' + (cy + 3) + '" text-anchor="middle" font-size="9" '
+      + 'fill="#fffdf6" font-family="Georgia,serif">' + (i + 1) + '</text>'
+      + '<text x="' + cx + '" y="' + ly + '" text-anchor="' + anchor + '" font-size="8" '
+      + 'fill="#2b3a47" font-family="PingFang SC,Microsoft YaHei,sans-serif">' + label + '</text>';
+  });
+
+  var legend = '';
+  Object.keys(modesUsed).forEach(function(m){
+    legend += '<span><i style="border-top-color:' + MODE_C[m] + ';border-top-style:'
+      + (MODE_DASH[m] ? 'dashed' : 'solid') + '"></i>' + MODE_LABEL[m] + '</span>';
+  });
+
+  var svg = '<svg class="map" viewBox="0 0 400 180" xmlns="http://www.w3.org/2000/svg">'
+    + grid + paths + nodes + '</svg>';
+
+  return '<div class="mapbox">' + svg + '<div class="legend">'
+    + '<span><i style="border-top-color:' + rc + ';border-top-style:solid"></i>站点顺序</span>'
+    + legend + '<span style="margin-left:auto;opacity:.6">示意图 · 非实际比例</span>'
+    + '</div></div>';
+}
+
+/* ---------- 单日页 ---------- */
+function dayHTML(day, idx){
+  var rc = RC[day.rc] || 'var(--london)';
+  var num = (idx < 10 ? '0' : '') + idx;
+  var pinOf = {};
+  ((day.map && day.map.stops) || []).forEach(function(s, i){ pinOf[s.k] = i + 1; });
+
+  var tl = day.it.map(function(it, i){
+    var isStop = pinOf[i] !== undefined;
+    return '<li class="tl-i' + (isStop ? ' key' : '') + '" style="--i:' + i + ';--rc:' + rc + '">'
+      + '<div class="tl-t">' + it.t + '</div>'
+      + '<div class="tl-rail"><span class="tl-d"></span></div>'
+      + '<div class="tl-c"><div class="tl-n">'
+      + (isStop ? '<span class="pin">' + pinOf[i] + '</span>' : '')
+      + it.n + '</div>'
+      + '<div class="tl-x">' + it.d + '</div></div></li>';
+  }).join('');
+
+  var tags = day.tags.map(function(t){
+    return '<span class="tag ' + (t[0] || '') + '">' + t[1] + '</span>';
+  }).join('');
+
+  return '<div class="wrap" style="--rc:' + rc + '">'
+    + '<div class="dhead">'
+      + '<div class="dno">' + num + '</div>'
+      + '<div class="dmeta"><div class="ddate">' + day.d + ' · ' + day.wd + ' · ' + day.city + '</div>'
+      + '<h2>' + day.title + '</h2><div class="dsub">' + day.sub + '</div></div>'
+      + '<div class="dstay">住宿 <b>' + day.stay + '</b></div>'
+    + '</div>'
+    + '<div class="dgrid">'
+      + '<div>'
+        + '<div class="art">' + (SCENES[day.scene] || SCENES.done)
+        + '<span class="art-cap">' + day.cap + '</span></div>'
+        + '<div class="tags">' + tags + '</div>'
+        + mapSVG(day)
+      + '</div>'
+      + '<div><ol class="tl">' + tl + '</ol>'
+        + '<div class="note"><b>安排说明 · </b>' + day.note + '</div>'
+      + '</div>'
+    + '</div></div>';
+}
+
+/* ---------- 总览页 ---------- */
+function overviewHTML(){
+  var spine = '<svg class="map" viewBox="0 0 380 300" xmlns="http://www.w3.org/2000/svg">'
+    + '<g stroke="#131c25" stroke-width=".4" opacity=".07">'
+    + [0,1,2,3,4,5,6,7,8,9].map(function(i){ return '<line x1="' + (i*42) + '" y1="0" x2="' + (i*42) + '" y2="300"/>'; }).join('')
+    + [0,1,2,3,4,5,6,7,8,9,10].map(function(i){ return '<line x1="0" y1="' + (i*30) + '" x2="380" y2="' + (i*30) + '"/>'; }).join('')
+    + '</g>'
+    /* 伦敦 → 峰区 → 爱丁堡 主干 */
+    + '<path d="M104 244 L104 142 L104 52" fill="none" stroke="#a3352b" stroke-width="2.4" stroke-dasharray="9 5"/>'
+    + '<path d="M104 52 L104 142 L104 244" fill="none" stroke="none"/>'
+    /* 节点 */
+    + '<g><circle cx="104" cy="52" r="12" fill="#fffdf6"/><circle cx="104" cy="52" r="10" fill="#3f556c"/>'
+    + '<text x="104" y="56" text-anchor="middle" font-size="10" fill="#fffdf6" font-family="Georgia,serif">3</text>'
+    + '<text x="122" y="50" font-size="10.5" fill="#131c25" font-family="PingFang SC,sans-serif" font-weight="600">爱丁堡</text>'
+    + '<text x="122" y="63" font-size="8" fill="#8a939c" font-family="PingFang SC,sans-serif">2 晚 · 城堡 / 峭壁</text></g>'
+    + '<g><circle cx="104" cy="142" r="12" fill="#fffdf6"/><circle cx="104" cy="142" r="10" fill="#6d7c3c"/>'
+    + '<text x="104" y="146" text-anchor="middle" font-size="10" fill="#fffdf6" font-family="Georgia,serif">2</text>'
+    + '<text x="122" y="140" font-size="10.5" fill="#131c25" font-family="PingFang SC,sans-serif" font-weight="600">谢菲尔德</text>'
+    + '<text x="122" y="153" font-size="8" fill="#8a939c" font-family="PingFang SC,sans-serif">1 晚 · 达西庄园 / 哈德威克</text></g>'
+    + '<g><circle cx="104" cy="244" r="12" fill="#fffdf6"/><circle cx="104" cy="244" r="10" fill="#a3352b"/>'
+    + '<text x="104" y="248" text-anchor="middle" font-size="10" fill="#fffdf6" font-family="Georgia,serif">1</text>'
+    + '<text x="122" y="242" font-size="10.5" fill="#131c25" font-family="PingFang SC,sans-serif" font-weight="600">伦敦</text>'
+    + '<text x="122" y="255" font-size="8" fill="#8a939c" font-family="PingFang SC,sans-serif">13 晚 · 伦敦基地</text></g>'
+    /* 段信息 */
+    + '<g font-family="PingFang SC,sans-serif" font-size="7.5" fill="#54606b">'
+    + '<text x="60" y="200" text-anchor="end">火车 1h50</text>'
+    + '<text x="60" y="100" text-anchor="end">火车 3h20</text>'
+    + '<text x="88" y="92" text-anchor="end">✈ 直飞 1h20 回伦敦</text></g>'
+    /* 一日游分支 */
+    + '<g stroke="#a8822f" stroke-width=".9" stroke-dasharray="2 4" opacity=".85">'
+    + '<path d="M116 248 L262 168"/><path d="M116 246 L262 196"/>'
+    + '<path d="M116 242 L262 224"/><path d="M116 238 L262 252"/></g>'
+    + '<g font-family="PingFang SC,sans-serif" font-size="8" fill="#8a6320">'
+    + '<text x="268" y="171">牛津 1/20</text><text x="268" y="199">温莎 1/22</text>'
+    + '<text x="268" y="227">比斯特 1/23</text><text x="268" y="255">剑桥 1/21</text></g>'
+    + '<g stroke="#a8822f" stroke-width=".9" stroke-dasharray="2 4" opacity=".85">'
+    + '<path d="M116 256 L262 282"/></g>'
+    + '<text x="268" y="285" font-family="PingFang SC,sans-serif" font-size="8" fill="#8a6320">格林尼治 1/28</text>'
+    + '</svg>';
+
+  var rows = [
+    ['主线 1', '伦敦 → 峰区', '1/24 · 火车 1h50'],
+    ['主线 2', '峰区 → 爱丁堡', '1/25 · 直达 3h20'],
+    ['主线 3', '爱丁堡 → 伦敦', '1/27 · 飞 1h20']
+  ].map(function(r){
+    return '<div class="r3"><b>' + r[0] + '</b><span>' + r[1] + '</span><em></em><span>' + r[2] + '</span></div>';
+  }).join('');
+
+  var budget = BUDGET.map(function(b){
+    return '<tr><td>' + b[0] + '</td><td>' + b[1] + '</td></tr>';
+  }).join('');
+
+  return '<div class="wrap">'
+    + '<div class="ov-hero">'
+      + '<div>'
+        + '<div class="ov-kicker">United Kingdom · 18 Days · Winter</div>'
+        + '<h1 class="ov-h1">住在伦敦，<br><span>三次北上</span>把岛跑完</h1>'
+        + '<p class="ov-p">以伦敦为基地，先把哈利波特与柯南的取景地一口气扫完，'
+        + '再北上峰区看达西庄园外观、进同族的哈德威克庄园，一路到爱丁堡，最后从爱丁堡飞回伦敦收尾。</p>'
+        + '<div class="ov-stats">'
+          + '<div><b>18</b><span>天 · 17 晚</span></div>'
+          + '<div><b>3</b><span>个城市过夜</span></div>'
+          + '<div><b>4</b><span>个一日游</span></div>'
+          + '<div><b>2.2</b><span>万 · 不含购物</span></div>'
+        + '</div>'
+        + '<table style="width:100%;margin-top:22px;border-collapse:collapse;font-size:12.5px">'
+          + '<thead><tr><th style="text-align:left;font-family:var(--mono);font-size:10px;'
+          + 'letter-spacing:.14em;color:var(--ink3);font-weight:400;padding-bottom:6px">预算 / 元</th>'
+          + '<th></th></tr></thead>'
+          + '<tbody>' + budget.replace(/<td>/g, '<td style="padding:6px 0;border-top:1px solid var(--line)">') + '</tbody>'
+        + '</table>'
+        + '<div class="note" style="--rc:var(--accent);margin-top:20px"><b>冬季穿着与安全 · </b>'
+        + '1 月伦敦 3–8°C、爱丁堡 1–6°C，风大体感再低 3–5 度，但全是城市与成熟景区，'
+        + '普通羽绒服 + 毛线帽 + 手套 + 围巾就够。唯一值得多花的是一双防滑防水的鞋（石板路遇雨很滑），'
+        + '再加几个暖宝宝。整趟行程没有需要登山杖、冰爪、头灯的路段 —— '
+        + '所有观景点都改成了"车到即景或平路可达"，天黑前回到室内。</div>'
+      + '</div>'
+      + '<div>'
+        + '<div class="ov-map">' + spine + '</div>'
+        + '<div class="route3">' + rows + '</div>'
+        + '<div class="note" style="--rc:var(--brass)"><b>为什么这样排 · </b>'
+        + '同一片区只去一次：西敏一片、金融城一片、国王十字到摄政街一条线，'
+        + '峰区只进一次山、爱丁堡只住两晚。唯一的长距离折返是 1/27 从爱丁堡飞回伦敦，'
+        + '因为要取行李并回到伦敦的住处，这一段坐飞机比火车省 3 小时。</div>'
+      + '</div>'
+    + '</div></div>';
+}
+
+/* ---------- 组装 ---------- */
+var SCREENS = [];
+function buildAll(){
+  var html = '<section class="screen" data-i="0">' + overviewHTML() + '</section>';
+  DAYS.forEach(function(d, i){
+    html += '<section class="screen" data-i="' + (i + 1) + '">' + dayHTML(d, i + 1) + '</section>';
+  });
+  $stage.innerHTML = html;
+  SCREENS = Array.prototype.slice.call($stage.querySelectorAll('.screen'));
+
+  var chips = '<button class="chip ov" data-i="0">总览</button>';
+  DAYS.forEach(function(d, i){
+    chips += '<button class="chip" data-i="' + (i + 1) + '" title="' + d.title + '">'
+      + d.d + '<span style="opacity:.55"> ' + d.wd.replace('周', '') + '</span></button>';
+  });
+  $tape.innerHTML = chips;
+  $tape.querySelectorAll('.chip').forEach(function(c){
+    c.addEventListener('click', function(){ go(parseInt(c.dataset.i, 10)); });
+  });
+}
+
+/* ---------- 翻页 ---------- */
+var cur = 0;
+function go(i){
+  if (i < 0) i = 0;
+  if (i > SCREENS.length - 1) i = SCREENS.length - 1;
+  if (i === cur && SCREENS[i].classList.contains('on')) return;
+  SCREENS.forEach(function(s, k){
+    s.classList.toggle('on', k === i);
+    if (k !== i) s.scrollTop = 0;
+  });
+  cur = i;
+  $prog.style.width = (i / (SCREENS.length - 1) * 100) + '%';
+  $cnt.innerHTML = '<b>' + (i === 0 ? '总览' : 'D' + i) + '</b> / ' + DAYS.length;
+  $prev.disabled = (i === 0);
+  $next.disabled = (i === SCREENS.length - 1);
+  $tape.querySelectorAll('.chip').forEach(function(c){
+    var on = parseInt(c.dataset.i, 10) === i;
+    c.classList.toggle('on', on);
+    if (on && c.scrollIntoView) {
+      c.scrollIntoView({block:'nearest', inline:'center', behavior:'smooth'});
+    }
+  });
+}
+
+$prev.addEventListener('click', function(){ go(cur - 1); });
+$next.addEventListener('click', function(){ go(cur + 1); });
+
+document.addEventListener('keydown', function(e){
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' '){ e.preventDefault(); go(cur + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); go(cur - 1); }
+  if (e.key === 'Home'){ e.preventDefault(); go(0); }
+  if (e.key === 'End'){ e.preventDefault(); go(SCREENS.length - 1); }
+});
+
+/* 触屏滑动 */
+var tx = 0, ty = 0, tt = 0;
+$stage.addEventListener('touchstart', function(e){
+  tx = e.touches[0].clientX; ty = e.touches[0].clientY; tt = Date.now();
+}, {passive:true});
+$stage.addEventListener('touchend', function(e){
+  var dx = e.changedTouches[0].clientX - tx;
+  var dy = e.changedTouches[0].clientY - ty;
+  if (Date.now() - tt > 700) return;
+  if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.6){
+    go(dx < 0 ? cur + 1 : cur - 1);
+  }
+}, {passive:true});
+
+buildAll();
+go(0);
+
+</script>
+</body>
+</html>
